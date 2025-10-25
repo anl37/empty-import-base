@@ -3,6 +3,7 @@ import { Sparkles, Calendar } from "lucide-react";
 import { TabNavigation } from "@/components/TabNavigation";
 import { ConnectionCard } from "@/components/ConnectionCard";
 import { VenueSelectorDialog } from "@/components/VenueSelectorDialog";
+import { LocationInfoSheet } from "@/components/LocationInfoSheet";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,8 @@ const NextUp = () => {
   const [selectedVenue, setSelectedVenue] = useState<VenueSuggestion | null>(null);
   const [meetTime, setMeetTime] = useState("");
   const [pendingPlan, setPendingPlan] = useState<MeetPlan | null>(null);
+  const [selectedPoi, setSelectedPoi] = useState<{ name: string; placeId: string; location: { lat: number; lng: number } } | null>(null);
+  const [showLocationSheet, setShowLocationSheet] = useState(false);
 
   // Mock current user interests for demo
   const currentUserInterests = ["coffee", "reading", "nature"];
@@ -78,6 +81,35 @@ const NextUp = () => {
     setMeetTime(format(defaultTime, "yyyy-MM-dd'T'HH:mm"));
     
     setShowTimeConfirm(true);
+  };
+
+  const handlePoiConfirm = () => {
+    if (!selectedConnection || !selectedPoi) return;
+
+    const plan: MeetPlan = {
+      id: Math.random().toString(36).substr(2, 9),
+      matchName: selectedConnection.name,
+      place: {
+        name: selectedPoi.name,
+        address: "Durham, NC",
+        lat: selectedPoi.location.lat,
+        lng: selectedPoi.location.lng,
+      },
+      startAt: new Date(Date.now() + 60 * 60 * 1000), // Default 1 hour from now
+      meetCode: `🎯-${Math.floor(Math.random() * 99)}`,
+      distanceM: 0,
+      status: "confirmed",
+    };
+
+    addPlan(plan);
+
+    toast({
+      title: "✨ Next event confirmed!",
+      description: `Meeting ${selectedConnection.name} at ${selectedPoi.name}`,
+    });
+
+    setShowLocationSheet(false);
+    setSelectedPoi(null);
   };
 
   const handleConfirmPlan = () => {
@@ -205,6 +237,22 @@ const NextUp = () => {
         onClose={() => setShowVenueSelector(false)}
         onSelectVenue={handleVenueSelect}
         onMapVenueSelect={handleMapVenueSelect}
+        onPoiClick={(poi) => {
+          setSelectedPoi(poi);
+          setShowLocationSheet(true);
+        }}
+      />
+
+      {/* Location Info Sheet for POI clicks */}
+      <LocationInfoSheet
+        open={showLocationSheet}
+        onOpenChange={setShowLocationSheet}
+        locationName={selectedPoi?.name || ""}
+        connectCount={0}
+        placeId={selectedPoi?.placeId}
+        location={selectedPoi?.location}
+        showConfirmButton={!!selectedConnection}
+        onConfirm={handlePoiConfirm}
       />
 
       {/* Time Confirmation Dialog */}

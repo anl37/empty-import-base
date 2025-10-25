@@ -31,6 +31,7 @@ interface Location {
 interface GoogleSpacesMapProps {
   venues?: Location[];
   onVenueSelect?: (venue: Location) => void;
+  onPoiClick?: (poi: { name: string; placeId: string; location: { lat: number; lng: number } }) => void;
   selectedVenueId?: string | null;
   height?: string;
   showHeader?: boolean;
@@ -40,6 +41,7 @@ interface GoogleSpacesMapProps {
 export const GoogleSpacesMap = ({ 
   venues = DURHAM_RECS, 
   onVenueSelect,
+  onPoiClick,
   selectedVenueId = null,
   height = "300px",
   showHeader = true,
@@ -87,6 +89,34 @@ export const GoogleSpacesMap = ({
         });
 
         mapRef.current = map;
+
+        // Add POI click listener
+        if (onPoiClick) {
+          map.addListener('click', (event: any) => {
+            const placeId = event.placeId;
+            if (placeId) {
+              event.stop(); // Prevent default info window
+              
+              const service = new google.maps.places.PlacesService(map);
+              service.getDetails(
+                { placeId: placeId, fields: ['name', 'geometry', 'place_id'] },
+                (place, status) => {
+                  if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+                    onPoiClick({
+                      name: place.name || 'Unknown Location',
+                      placeId: place.place_id || placeId,
+                      location: {
+                        lat: place.geometry?.location?.lat() || 0,
+                        lng: place.geometry?.location?.lng() || 0,
+                      },
+                    });
+                  }
+                }
+              );
+            }
+          });
+        }
+
         setIsLoading(false);
       } catch (error) {
         console.error('Error loading Google Maps:', error);

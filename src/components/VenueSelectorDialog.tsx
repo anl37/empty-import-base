@@ -19,6 +19,7 @@ interface VenueSelectorDialogProps {
   onClose: () => void;
   onSelectVenue: (venue: VenueSuggestion) => void;
   onMapVenueSelect?: (venue: VenueSuggestion) => void;
+  onPoiClick?: (poi: { name: string; placeId: string; location: { lat: number; lng: number } }) => void;
 }
 
 export const VenueSelectorDialog = ({
@@ -29,6 +30,7 @@ export const VenueSelectorDialog = ({
   onClose,
   onSelectVenue,
   onMapVenueSelect,
+  onPoiClick,
 }: VenueSelectorDialogProps) => {
   const [selectedVenue, setSelectedVenue] = useState<VenueSuggestion | null>(null);
   const [selectedMapVenue, setSelectedMapVenue] = useState<VenueSuggestion | null>(null);
@@ -245,6 +247,7 @@ export const VenueSelectorDialog = ({
                   <GoogleSpacesMap 
                     venues={venues}
                     onVenueSelect={handleMapVenueClick}
+                    onPoiClick={onPoiClick}
                     selectedVenueId={selectedMapVenue?.id}
                     height="500px"
                     showHeader={false}
