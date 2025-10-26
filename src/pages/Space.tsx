@@ -59,7 +59,10 @@ const mockUsers = [
 ];
 
 const Space = () => {
-  const [connectEnabled, setConnectEnabled] = useState(false);
+  const [connectEnabled, setConnectEnabled] = useState(() => {
+    const saved = localStorage.getItem('connectEnabled');
+    return saved === 'true';
+  });
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(getCurrentTime());
   const [showConnectDialog, setShowConnectDialog] = useState(false);
@@ -190,6 +193,11 @@ const Space = () => {
     
     updateVenueFromLocation();
   }, [location, toast]);
+
+  // Persist connect status
+  useEffect(() => {
+    localStorage.setItem('connectEnabled', connectEnabled.toString());
+  }, [connectEnabled]);
 
   // Update time every minute
   useEffect(() => {
