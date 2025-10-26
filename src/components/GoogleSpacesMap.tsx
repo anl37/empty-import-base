@@ -138,62 +138,7 @@ export const GoogleSpacesMap = ({
     };
   }, []); // Only initialize once
 
-  // Update markers when venues or callbacks change
-  useEffect(() => {
-    if (!mapRef.current) return;
-
-    const map = mapRef.current;
-    const service = new google.maps.places.PlacesService(map);
-
-    // Clear existing markers
-    markersRef.current.forEach(marker => {
-      (marker as any).setMap(null);
-    });
-    markersRef.current.clear();
-
-    // Create new markers
-    venues.forEach((location) => {
-      const request = {
-        location: { lat: location.lat, lng: location.lng },
-        radius: 50,
-        keyword: location.name,
-      };
-
-      service.nearbySearch(request, (results, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results && results[0]) {
-          const place = results[0];
-          
-          const infoWindow = new google.maps.InfoWindow();
-          
-          const marker = new google.maps.Marker({
-            map,
-            position: place.geometry?.location,
-            title: place.name,
-          });
-
-          marker.addListener('click', () => {
-            if (onVenueSelect && location.id) {
-              onVenueSelect(location);
-            }
-            
-            const count = location.id ? locationCounts[location.id] || 0 : 0;
-            const content = `
-              <div style="padding: 8px;">
-                <h3 style="margin: 0 0 8px 0; font-weight: bold;">${location.name}</h3>
-                <p style="margin: 0; font-size: 14px;">${count} ${count === 1 ? 'person' : 'people'} open to connect</p>
-              </div>
-            `;
-            infoWindow.setContent(content);
-            infoWindow.open(map, marker);
-          });
-
-          if (location.id) {
-            markersRef.current.set(location.id, marker as any);
-          }
-        }
-      });
-    });
-  }, [venues, onVenueSelect, locationCounts]);
+  // Custom markers removed - now using only native Google Maps POIs
 
   return (
     <div className="relative w-full rounded-3xl overflow-hidden shadow-soft" style={{ height }}>
