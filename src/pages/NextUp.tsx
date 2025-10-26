@@ -3,7 +3,7 @@ import { Sparkles, Calendar } from "lucide-react";
 import { TabNavigation } from "@/components/TabNavigation";
 import { ConnectionCard } from "@/components/ConnectionCard";
 import { VenueSelectorDialog } from "@/components/VenueSelectorDialog";
-import { LocationInfoSheet } from "@/components/LocationInfoSheet";
+import { PoiInfoPanel } from "@/components/PoiInfoPanel";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,6 @@ const NextUp = () => {
   const [meetTime, setMeetTime] = useState("");
   const [pendingPlan, setPendingPlan] = useState<MeetPlan | null>(null);
   const [selectedPoi, setSelectedPoi] = useState<{ name: string; placeId: string; location: { lat: number; lng: number } } | null>(null);
-  const [showLocationSheet, setShowLocationSheet] = useState(false);
 
   // Mock current user interests for demo
   const currentUserInterests = ["coffee", "reading", "nature"];
@@ -108,7 +107,6 @@ const NextUp = () => {
       description: `Meeting ${selectedConnection.name} at ${selectedPoi.name}`,
     });
 
-    setShowLocationSheet(false);
     setSelectedPoi(null);
   };
 
@@ -237,23 +235,11 @@ const NextUp = () => {
         onClose={() => setShowVenueSelector(false)}
         onSelectVenue={handleVenueSelect}
         onMapVenueSelect={handleMapVenueSelect}
-        onPoiClick={(poi) => {
-          setSelectedPoi(poi);
-          setShowLocationSheet(true);
-        }}
+        onPoiClick={(poi) => setSelectedPoi(poi)}
+        selectedPoi={selectedPoi}
+        onPoiConfirm={handlePoiConfirm}
       />
 
-      {/* Location Info Sheet for POI clicks */}
-      <LocationInfoSheet
-        open={showLocationSheet}
-        onOpenChange={setShowLocationSheet}
-        locationName={selectedPoi?.name || ""}
-        connectCount={0}
-        placeId={selectedPoi?.placeId}
-        location={selectedPoi?.location}
-        showConfirmButton={!!selectedConnection}
-        onConfirm={handlePoiConfirm}
-      />
 
       {/* Time Confirmation Dialog */}
       <Dialog open={showTimeConfirm} onOpenChange={setShowTimeConfirm}>

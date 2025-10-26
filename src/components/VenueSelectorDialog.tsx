@@ -6,6 +6,7 @@ import { ArrowLeft, MapPin, Clock, Star, Loader2 } from "lucide-react";
 import { VenueSuggestion, ConnectionProfile } from "@/types/connection";
 import { formatDistance, metersBetween } from "@/lib/location-utils";
 import { GoogleSpacesMap } from "./GoogleSpacesMap";
+import { PoiInfoPanel } from "./PoiInfoPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { DEFAULT_CITY_CENTER } from "@/config/city";
 import { toast } from "sonner";
@@ -20,6 +21,8 @@ interface VenueSelectorDialogProps {
   onSelectVenue: (venue: VenueSuggestion) => void;
   onMapVenueSelect?: (venue: VenueSuggestion) => void;
   onPoiClick?: (poi: { name: string; placeId: string; location: { lat: number; lng: number } }) => void;
+  selectedPoi?: { name: string; placeId: string; location: { lat: number; lng: number } } | null;
+  onPoiConfirm?: () => void;
 }
 
 export const VenueSelectorDialog = ({
@@ -31,6 +34,8 @@ export const VenueSelectorDialog = ({
   onSelectVenue,
   onMapVenueSelect,
   onPoiClick,
+  selectedPoi,
+  onPoiConfirm,
 }: VenueSelectorDialogProps) => {
   const [selectedVenue, setSelectedVenue] = useState<VenueSuggestion | null>(null);
   const [selectedMapVenue, setSelectedMapVenue] = useState<VenueSuggestion | null>(null);
@@ -253,7 +258,7 @@ export const VenueSelectorDialog = ({
                     showHeader={false}
                   />
                   
-                  {/* Info Panel - Bottom Left */}
+                  {/* Map Venue Info Panel - Bottom Left */}
                   {selectedMapVenue && (
                     <div 
                       className="absolute bottom-4 left-4 bg-background/95 backdrop-blur-sm rounded-xl p-4 shadow-lg z-[1000] max-w-xs"
@@ -300,6 +305,16 @@ export const VenueSelectorDialog = ({
                     </Button>
                   </div>
                 </div>
+
+                {/* POI Info Panel */}
+                {selectedPoi && (
+                  <PoiInfoPanel
+                    locationName={selectedPoi.name}
+                    connectCount={0}
+                    showConfirmButton={true}
+                    onConfirm={onPoiConfirm}
+                  />
+                )}
               </div>
             </>
           )}

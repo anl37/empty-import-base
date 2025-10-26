@@ -1,7 +1,7 @@
 import { Map, MapPin } from "lucide-react";
 import { TabNavigation } from "@/components/TabNavigation";
 import { GoogleSpacesMap } from "@/components/GoogleSpacesMap";
-import { LocationInfoSheet } from "@/components/LocationInfoSheet";
+import { PoiInfoPanel } from "@/components/PoiInfoPanel";
 import { DURHAM_RECS } from "@/config/city";
 import { useUserPresence } from "@/hooks/useUserPresence";
 import { useState } from "react";
@@ -10,7 +10,6 @@ const Spaces = () => {
   const { locationCounts } = useUserPresence();
   const [selectedVenue, setSelectedVenue] = useState<{ name: string; id?: string; type?: string } | null>(null);
   const [selectedPoi, setSelectedPoi] = useState<{ name: string; placeId: string; location: { lat: number; lng: number } } | null>(null);
-  const [showLocationSheet, setShowLocationSheet] = useState(false);
 
   return (
     <div className="min-h-screen bg-gradient-subtle pb-24">
@@ -36,11 +35,15 @@ const Spaces = () => {
         <GoogleSpacesMap 
           locationCounts={locationCounts} 
           onVenueSelect={(venue) => setSelectedVenue(venue)}
-          onPoiClick={(poi) => {
-            setSelectedPoi(poi);
-            setShowLocationSheet(true);
-          }}
+          onPoiClick={(poi) => setSelectedPoi(poi)}
         />
+        
+        {selectedPoi && (
+          <PoiInfoPanel
+            locationName={selectedPoi.name}
+            connectCount={locationCounts[selectedPoi.placeId] || 0}
+          />
+        )}
 
         {/* Location Info */}
         <div className="gradient-card rounded-2xl p-6 shadow-soft text-center">
@@ -66,15 +69,6 @@ const Spaces = () => {
           )}
         </div>
       </div>
-
-      <LocationInfoSheet
-        open={showLocationSheet}
-        onOpenChange={setShowLocationSheet}
-        locationName={selectedPoi?.name || ""}
-        connectCount={selectedPoi?.placeId ? locationCounts[selectedPoi.placeId] || 0 : 0}
-        placeId={selectedPoi?.placeId}
-        location={selectedPoi?.location}
-      />
 
       <TabNavigation />
     </div>
