@@ -85,29 +85,24 @@ const NextUp = () => {
   const handlePoiConfirm = () => {
     if (!selectedConnection || !selectedPoi) return;
 
-    const plan: MeetPlan = {
-      id: Math.random().toString(36).substr(2, 9),
-      matchName: selectedConnection.name,
-      place: {
-        name: selectedPoi.name,
-        address: "Durham, NC",
-        lat: selectedPoi.location.lat,
-        lng: selectedPoi.location.lng,
-      },
-      startAt: new Date(Date.now() + 60 * 60 * 1000), // Default 1 hour from now
-      meetCode: `🎯-${Math.floor(Math.random() * 99)}`,
+    // Convert POI to venue format for time dialog
+    setSelectedVenue({
+      id: selectedPoi.placeId,
+      name: selectedPoi.name,
+      lat: selectedPoi.location.lat,
+      lng: selectedPoi.location.lng,
       distanceM: 0,
-      status: "confirmed",
-    };
-
-    addPlan(plan);
-
-    toast({
-      title: "✨ Next event confirmed!",
-      description: `Meeting ${selectedConnection.name} at ${selectedPoi.name}`,
+      matchScore: 0,
+      category: "poi",
+      tags: [],
+      openNow: true,
     });
 
-    setSelectedPoi(null);
+    // Default to 1 hour from now
+    const defaultTime = new Date(Date.now() + 60 * 60 * 1000);
+    setMeetTime(format(defaultTime, "yyyy-MM-dd'T'HH:mm"));
+    
+    setShowTimeConfirm(true);
   };
 
   const handleConfirmPlan = () => {
@@ -138,6 +133,9 @@ const NextUp = () => {
       title: "✨ Plan confirmed!",
       description: `Meeting ${selectedConnection.name} at ${selectedVenue.name}`,
     });
+
+    // Clear POI selection if it was a POI
+    setSelectedPoi(null);
 
     // Show calendar download prompt
     setShowTimeConfirm(false);

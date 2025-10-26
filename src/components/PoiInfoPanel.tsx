@@ -35,7 +35,7 @@ export const PoiInfoPanel = ({
           size="lg"
           onClick={onConfirm}
         >
-          Confirm Next Event Here
+          Select This Spot
         </Button>
       )}
     </div>
