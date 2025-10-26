@@ -291,19 +291,6 @@ export const VenueSelectorDialog = ({
                       </div>
                     </div>
                   )}
-
-                  {/* Select Button - Bottom Right */}
-                  <div className="absolute bottom-4 right-4 z-[1000]">
-                    <Button
-                      onClick={handleConfirmMapSelection}
-                      disabled={!selectedMapVenue}
-                      size="lg"
-                      className="shadow-lg"
-                      aria-disabled={!selectedMapVenue}
-                    >
-                      Select This Spot
-                    </Button>
-                  </div>
                 </div>
 
                 {/* POI Info Panel */}
